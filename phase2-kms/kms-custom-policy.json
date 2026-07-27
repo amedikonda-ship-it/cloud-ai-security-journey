@@ -1,0 +1,45 @@
+{
+    "Version": "2012-10-17",
+    "Id": "phase2-custom-key-policy",
+    "Statement": [
+        {
+            "Sid": "EnableRootAccountAccess",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::473649005897:root"
+            },
+            "Action": "kms:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "AllowKeyAdministration",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::473649005897:user/AB-admin"
+            },
+            "Action": [
+                "kms:Describe*",
+                "kms:Get*",
+                "kms:List*",
+                "kms:ScheduleKeyDeletion",
+                "kms:PutKeyPolicy",
+                "kms:EnableKey",
+                "kms:DisableKey"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "AllowKeyUsageOnly",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::473649005897:user/AB-admin"
+            },
+            "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:GenerateDataKey"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
