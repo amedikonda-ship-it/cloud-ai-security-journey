@@ -1,0 +1,21 @@
+# Phase 2: KMS - Session 2 Corrections & Additional Depth
+
+## Corrected understanding (important - overrides earlier assumptions)
+- KMS authorization has THREE independent paths, not two: key policy explicit
+  allow, OR a valid grant, OR (when key policy delegates via root principal)
+  IAM policy allow. ANY ONE succeeding is sufficient.
+- An explicit principal statement in the key policy (naming a specific user/role
+  directly) is a COMPLETE, STANDALONE grant - it does NOT also require a matching
+  identity-based (IAM) policy. This was verified via AWS's own documentation
+  after an initial incorrect prediction was made and tested wrong.
+- Root-delegation statement in key policy ("Principal": {"AWS": "...:root"})
+  means "defer decision to IAM" - only in THIS specific case does IAM's
+  decision actually govern access.
+
+## What was built
+- Explicit key policy statement naming Test user directly for kms:Decrypt
+  (kms-explicit-policy.json / kms-add-test-user.json)
+- Enabled automatic annual key rotation (transparent to applications - key
+  ID/ARN never changes, old data remains decryptable automatically)
+- Created and revoked a KMS grant (temporary, independently revocable
+  permission mechanism, separate from key
