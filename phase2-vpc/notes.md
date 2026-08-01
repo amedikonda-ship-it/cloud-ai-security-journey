@@ -1,4 +1,4 @@
-# Phase 2: VPC Design (In Progress)
+# Phase 2: VPC Design
 
 ## Resources created
 - VPC: vpc-0c79de1eb8cc396fb (10.0.0.0/16), tag: Phase2-Custom-VPC
@@ -7,27 +7,38 @@
 - Internet Gateway: igw-090d6a7c9914ce220 (attached to VPC)
 - Public route table: rtb-0a00e9a42b41899d8 (0.0.0.0/0 -> IGW), associated
   with public subnet
+- Private route table: rtb-0e5f13c9dc49a9ca2 (0.0.0.0/0 -> NAT Gateway),
+  associated with private subnet
+- NAT Gateway: created, tested via route configuration, then DELETED after
+  verification to stop ongoing cost (~$0.045/hr). Associated Elastic IP
+  released. Standing infrastructure (VPC/subnets/route tables/IGW) costs
+  nothing while idle - only NAT Gateway/EIP/running instances cost money.
 
-## Status: INCOMPLETE
-- Private subnet still using default/main route table (no NAT Gateway route yet)
-- NAT Gateway creation was STARTED then stopped mid-session due to billing
-  concerns (Free Plan credit found to be expired as of 2026-07-22)
-- Elastic IP that was allocated for NAT Gateway has been RELEASED - no
-  NAT Gateway currently exists
+## Status: Core two-tier design COMPLETE
+- Public subnet: bidirectional internet access via IGW
+- Private subnet: outbound-only internet access via NAT Gateway (route
+  configured and verified; NAT Gateway itself deleted post-verification
+  to avoid ongoing charges - live traffic test skipped, config-level
+  verification only)
 
 ## Key concepts learned
 - Route tables control routing per-subnet via explicit association, not
-  automatically inherited from the VPC-level Internet Gateway attachment
+  automatically inherited from VPC-level Internet Gateway attachment
 - A VPC can have multiple route tables; only subnets explicitly associated
-  with a table use its rules (default: main route table, local traffic only)
+  with a table use its rules
+- Public vs private subnet distinction = which route table it's associated
+  with (IGW target vs NAT Gateway target vs no internet route at all),
+  not any inherent subnet property
+- NAT Gateway = outbound-only for private subnets; never provides inbound path
 - Real-world multi-route-table scenarios: different outbound paths per tier
   (IGW vs NAT vs on-prem VPN), per-AZ NAT Gateway isolation, traffic
   inspection requirements for specific subnets
-- NAT Gateway = outbound-only internet access for private subnets;
-  never provides a path for internet-initiated inbound connections
 
-## TODO next session
-- Decide on NAT Gateway (real, small ongoing cost) vs conceptual-only
-- Add private subnet route table + NAT Gateway route
-- Consider adding a third (database) subnet with zero internet route,
-  completing a realistic 3-tier design
+## Not yet covered
+- Third (database) tier subnet with zero internet route
+- Network ACLs (subnet-level stateless firewall)
+- Multi-AZ redundancy (currently single-AZ: us-east-1a only)lling
+ol routing per-subnet via explicit association, not
+level Internet Gateway attachment
+ateway (real, small ongoing cost) vs conceptual-only
+way route
